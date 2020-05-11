@@ -3,6 +3,7 @@ import {
   HasObjectKeyRule,
   IsObjectRule,
   ValidationRule,
+  IsEmptyArrayRule,
 } from './validationrule';
 import { RuleResultSeverity } from './ruleevent';
 import { Output } from '../utils/output';
@@ -13,7 +14,7 @@ export class JSONValidator {
     rules.push(new IsObjectRule(json));
     rules.push(new HasObjectKeyRule(json));
     rules.push(new HasIdAttributeRule(json));
-
+    rules.push(new IsEmptyArrayRule(json));
     Output.setInfo(
       'ValidationRule:' +
         'Result'.padStart(60 - 'ValidationRule'.length) +

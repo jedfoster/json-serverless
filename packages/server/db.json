@@ -20,5 +20,13 @@
   ],
   "profile": {
     "name": "typicode"
-  }
+  },
+  "coordinates": [
+    {
+      "id": 3,
+      "latitude": 40.73061,
+      "longitude": -73.935242,
+      "newarray": []
+    }
+  ]
 }
