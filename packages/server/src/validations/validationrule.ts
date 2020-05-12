@@ -1,5 +1,4 @@
 import { RuleEvent, RuleResultSeverity, RuleEventList } from './ruleevent';
-
 export abstract class ValidationRule {
   protected jsonObject = {} as object;
   ruleEvents = new Array<RuleEvent>();
@@ -94,6 +93,22 @@ export class HasIdAttributeRule extends ValidationRule {
 }
 
 export class IsEmptyArrayRule extends ValidationRule {
+  static checkEmptyArrays(obj): Array<any> {
+    let test = new Array<any>();
+    Object.keys(obj).forEach(function(key) {
+      console.log(key);
+      if (Array.isArray(obj[key])) {
+        if (obj[key] === []) {
+          console.log('hello');
+          test.push(obj);
+        } else {
+          test = test.concat(IsEmptyArrayRule.checkEmptyArrays(obj[key]));
+        }
+      }
+    });
+    return test;
+  }
+
   validate(): RuleEvent[] {
     try {
       if (
@@ -101,20 +116,16 @@ export class IsEmptyArrayRule extends ValidationRule {
         typeof this.jsonObject === 'object' &&
         Object.keys(this.jsonObject).length !== 0
       ) {
-        Object.keys(this.jsonObject).forEach(item => {
-          let ruleSeverity = RuleResultSeverity.OK;
-          let message = '';
-          if (
-            Array.isArray(this.jsonObject[item]) &&
-            this.jsonObject[item].length === 0
-          ) {
-            (ruleSeverity = RuleResultSeverity.ALERT),
-              (message =
-                item +
-                ' is an empty array - please insert values or delete this property');
-          }
-          this.ruleEvents.push(new RuleEvent(ruleSeverity, message));
-        });
+        let ruleSeverity = RuleResultSeverity.OK;
+        let message = '';
+        const emptyArrays = IsEmptyArrayRule.checkEmptyArrays(this.jsonObject);
+        if (emptyArrays) {
+          (ruleSeverity = RuleResultSeverity.ALERT),
+            (message =
+              'json contains empty arrays - please insert values or delete this property: ' +
+              emptyArrays);
+        }
+        this.ruleEvents.push(new RuleEvent(ruleSeverity, message));
       }
     } catch (e) {
       const ruleSeverityError = RuleResultSeverity.ALERT;
